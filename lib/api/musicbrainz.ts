@@ -1,14 +1,15 @@
 import { Album } from '@/types';
 
 const BASE_URL = 'https://musicbrainz.org/ws/2';
-const USER_AGENT = 'PortraitAlbumGift/1.0.0 ( contact@example.com )'; // Replace with real contact if possible
+const USER_AGENT = 'AlbumGrid/1.0.0 (https://github.com/albumgrid)';
 
 interface MusicBrainzRelease {
   id: string;
   title: string;
-  date: string;
+  date?: string;
+  'primary-type'?: string;
+  'release-group'?: { 'primary-type'?: string };
   'artist-credit': Array<{ artist: { name: string } }>;
-  'cover-art-archive': { front: boolean };
 }
 
 interface MusicBrainzResponse {
@@ -16,10 +17,13 @@ interface MusicBrainzResponse {
 }
 
 export async function searchMusicBrainz(query: string, limit = 20): Promise<Album[]> {
+  // Search by artist name OR release name (album title)
+  const searchQuery = `(artist:"${query}" OR release:"${query}")`;
+
   const params = new URLSearchParams({
-    query: `release:${query} AND country:FR`, // Simple query syntax
+    query: searchQuery,
     fmt: 'json',
-    limit: limit.toString(),
+    limit: (limit * 2).toString(), // Request more to account for filtering
   });
 
   try {
@@ -35,18 +39,29 @@ export async function searchMusicBrainz(query: string, limit = 20): Promise<Albu
 
     const data: MusicBrainzResponse = await res.json();
 
-    // MB doesn't always return cover art directly, often need to check Cover Art Archive.
-    // We'll filter for those that claim to have front cover, but the URL construction is manual.
-    // http://coverartarchive.org/release/{mbid}/front
-    
+    // Deduplicate by title + artist (keep first occurrence which is usually highest scored)
+    const seen = new Set<string>();
+
     return data.releases
-      .filter((r) => r['cover-art-archive']?.front) 
+      .filter((r) => {
+        // Only include albums (check release-group type if available)
+        const type = r['release-group']?.['primary-type'];
+        if (type && type !== 'Album') return false;
+
+        // Deduplicate
+        const key = `${r.title.toLowerCase()}-${r['artist-credit']?.[0]?.artist?.name?.toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+
+        return true;
+      })
+      .slice(0, limit)
       .map((r) => ({
         id: r.id,
         title: r.title,
         artist: r['artist-credit']?.[0]?.artist?.name || 'Unknown Artist',
-        coverUrl: `https://coverartarchive.org/release/${r.id}/front-500`, // Using 500px image
-        source: 'musicbrainz',
+        coverUrl: `https://coverartarchive.org/release/${r.id}/front-500`,
+        source: 'musicbrainz' as const,
         releaseYear: r.date?.split('-')[0],
       }));
   } catch (error) {
