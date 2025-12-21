@@ -54,7 +54,7 @@ export function InspectorSidebar() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-6 mt-6">
+        <div className="flex flex-col gap-6 mt-6 p-4">
           {/* Portrait Format */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">

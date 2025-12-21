@@ -35,7 +35,7 @@ export function AlbumsListSidebar() {
           </SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 mt-4 min-h-0 -mx-6 px-6">
+        <ScrollArea className="flex-1 mt-4 min-h-0 -mx-6 px-6 py-4">
           {albums.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>Aucun album sélectionné</p>

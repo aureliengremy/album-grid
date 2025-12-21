@@ -46,7 +46,7 @@ export function LibrarySidebar() {
           </div>
         </div>
 
-        <div className="flex-1 mt-4 min-h-0">
+        <div className="flex-1 mt-4 min-h-0 p-4">
           <AlbumSearch />
         </div>
       </SheetContent>
