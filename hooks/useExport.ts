@@ -10,6 +10,47 @@ interface ExportOptions {
   filename: string;
 }
 
+/**
+ * Convert modern CSS color functions (lab, oklch, oklab) to RGB
+ * html2canvas doesn't support these color functions from Tailwind CSS 4
+ */
+function convertModernColorsToRgb(element: HTMLElement) {
+  const allElements = element.querySelectorAll('*');
+  const elementsToProcess = [element, ...Array.from(allElements)] as HTMLElement[];
+
+  elementsToProcess.forEach((el) => {
+    if (!(el instanceof HTMLElement)) return;
+
+    const computedStyle = window.getComputedStyle(el);
+    const colorProperties = [
+      'color',
+      'background-color',
+      'border-color',
+      'border-top-color',
+      'border-right-color',
+      'border-bottom-color',
+      'border-left-color',
+      'outline-color',
+    ];
+
+    colorProperties.forEach((prop) => {
+      const value = computedStyle.getPropertyValue(prop);
+      // Check if it uses modern color functions
+      if (value && (value.includes('lab(') || value.includes('oklch(') || value.includes('oklab('))) {
+        // Create a temporary element to get the computed RGB value
+        const temp = document.createElement('div');
+        temp.style.color = value;
+        document.body.appendChild(temp);
+        const rgbValue = window.getComputedStyle(temp).color;
+        document.body.removeChild(temp);
+
+        // Apply the RGB value using setProperty
+        el.style.setProperty(prop, rgbValue);
+      }
+    });
+  });
+}
+
 export function useExport() {
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -34,6 +75,10 @@ export function useExport() {
         useCORS: true,
         backgroundColor: null,
         logging: false,
+        // Convert modern CSS colors (lab, oklch) to RGB before rendering
+        onclone: (_doc, clonedElement) => {
+          convertModernColorsToRgb(clonedElement);
+        },
       });
 
       setProgress(80);
