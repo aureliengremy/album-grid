@@ -119,9 +119,12 @@ export function GridEditor() {
         
         {/* Placeholder if empty */}
         {albums.length === 0 && (
-           <div className="col-span-full h-64 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed border-muted rounded-lg">
+           <div
+             className="col-span-full h-64 flex flex-col items-center justify-center rounded-lg"
+             style={{ color: '#6b7280', border: '2px dashed #d1d5db' }}
+           >
              <p>No albums selected.</p>
-             <p className="text-sm">Search and add albums from the library.</p>
+             <p style={{ fontSize: '0.875rem' }}>Search and add albums from the library.</p>
            </div>
         )}
         </div>

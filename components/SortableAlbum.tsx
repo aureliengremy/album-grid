@@ -63,9 +63,12 @@ export const SortableAlbum = memo(function SortableAlbum({ album }: SortableAlbu
 
         {/* Labels Overlay */}
         {settings.showLabels && settings.labelPosition === 'overlay' && (
-           <div className="absolute inset-x-0 bottom-0 bg-black/70 p-2 text-white text-center">
+           <div
+             className="absolute inset-x-0 bottom-0 p-2 text-center"
+             style={{ backgroundColor: 'rgba(0,0,0,0.7)', color: 'white' }}
+           >
              <p className="text-xs font-bold truncate">{album.title}</p>
-             <p className="text-xs truncate opacity-80">{album.artist}</p>
+             <p className="text-xs truncate" style={{ opacity: 0.8 }}>{album.artist}</p>
            </div>
         )}
 
@@ -79,7 +82,8 @@ export const SortableAlbum = memo(function SortableAlbum({ album }: SortableAlbu
           onPointerDown={(e) => {
             e.stopPropagation();
           }}
-          className="absolute top-1 right-1 bg-black/60 hover:bg-destructive text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-white"
+          className="absolute top-1 right-1 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 focus:outline-none"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white' }}
           aria-label={`Supprimer ${album.title} de ${album.artist}`}
         >
           <X className="w-3 h-3" />

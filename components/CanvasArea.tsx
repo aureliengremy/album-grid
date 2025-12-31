@@ -5,7 +5,7 @@ import { GridEditor } from "./GridEditor";
 
 export function CanvasArea() {
   return (
-    <div className="flex-1 bg-gray-100 relative flex items-center justify-center overflow-hidden">
+    <div className="flex-1 relative flex items-center justify-center overflow-hidden" style={{ backgroundColor: '#f3f4f6' }}>
       {/* 
         We use a ScrollArea to allow the canvas to be larger than viewport.
         However, for a nice editor feel, we might want centering.
