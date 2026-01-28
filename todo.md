@@ -12,4 +12,4 @@
 - [ ] Ajouter SPOTIFY_CLIENT_SECRET dans .env.local
 
 ## Documentation
-- [ ] Créer un fichier .env.example
+- [x] Créer un fichier .env.example

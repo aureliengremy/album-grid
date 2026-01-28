@@ -10,6 +10,59 @@ interface ExportOptions {
   filename: string;
 }
 
+// Convert an image URL to base64 data URL via our proxy
+async function imageToBase64(url: string): Promise<string> {
+  try {
+    // Use proxy to avoid CORS issues
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+    const response = await fetch(proxyUrl);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error('Failed to convert image to base64:', url, error);
+    // Return original URL as fallback
+    return url;
+  }
+}
+
+// Convert all images in the element to base64 to avoid CORS issues
+async function convertImagesToBase64(element: HTMLElement): Promise<Map<HTMLImageElement, string>> {
+  const images = element.querySelectorAll('img');
+  const originalSrcs = new Map<HTMLImageElement, string>();
+
+  const conversions = Array.from(images).map(async (img) => {
+    const src = img.src;
+    // Skip if already a data URL or blob URL
+    if (src.startsWith('data:') || src.startsWith('blob:')) {
+      return;
+    }
+
+    originalSrcs.set(img, src);
+    const base64 = await imageToBase64(src);
+    img.src = base64;
+  });
+
+  await Promise.all(conversions);
+  return originalSrcs;
+}
+
+// Restore original image sources
+function restoreImageSources(originalSrcs: Map<HTMLImageElement, string>) {
+  originalSrcs.forEach((src, img) => {
+    img.src = src;
+  });
+}
+
 export function useExport() {
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -24,11 +77,16 @@ export function useExport() {
     setIsExporting(true);
     setProgress(10);
 
+    let originalSrcs: Map<HTMLImageElement, string> | null = null;
+
     try {
-      // Lazy load html-to-image only when needed
-      const htmlToImage = await import('html-to-image');
+      // Convert all images to base64 to avoid CORS issues
+      toast.info('Préparation des images...');
+      originalSrcs = await convertImagesToBase64(element);
       setProgress(30);
 
+      // Lazy load html-to-image only when needed
+      const htmlToImage = await import('html-to-image');
       setProgress(50);
 
       // Export with html-to-image using toBlob (more reliable than data URLs!)
@@ -106,15 +164,19 @@ export function useExport() {
       link.click();
       document.body.removeChild(link);
       
-      // Clean up the blob URL after download completes (1s is safe for most browsers)
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // Clean up the blob URL after download completes (10s for large files)
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
 
       setProgress(100);
-      toast.success('Export successful');
+      toast.success('Export réussi !');
     } catch (error) {
       console.error('Export failed', error);
-      toast.error('Export failed');
+      toast.error('Export échoué. Veuillez réessayer.');
     } finally {
+      // Restore original image sources
+      if (originalSrcs) {
+        restoreImageSources(originalSrcs);
+      }
       setIsExporting(false);
       setProgress(0);
     }

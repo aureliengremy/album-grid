@@ -59,6 +59,7 @@ export const SortableAlbum = memo(function SortableAlbum({ album }: SortableAlbu
           className="w-full h-full object-cover pointer-events-none select-none"
           loading="lazy"
           draggable={false}
+          crossOrigin="anonymous"
         />
 
         {/* Labels Overlay */}
