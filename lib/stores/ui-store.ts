@@ -6,6 +6,8 @@ interface UIState {
   isExportOpen: boolean;
   isShortcutsOpen: boolean;
   isAlbumsListOpen: boolean;
+  isAuthOpen: boolean;
+  isProjectsOpen: boolean;
   openLibrary: () => void;
   closeLibrary: () => void;
   toggleLibrary: () => void;
@@ -21,6 +23,12 @@ interface UIState {
   openAlbumsList: () => void;
   closeAlbumsList: () => void;
   toggleAlbumsList: () => void;
+  openAuth: () => void;
+  closeAuth: () => void;
+  toggleAuth: () => void;
+  openProjects: () => void;
+  closeProjects: () => void;
+  toggleProjects: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -29,6 +37,8 @@ export const useUIStore = create<UIState>((set) => ({
   isExportOpen: false,
   isShortcutsOpen: false,
   isAlbumsListOpen: false,
+  isAuthOpen: false,
+  isProjectsOpen: false,
   openLibrary: () => set({ isLibraryOpen: true }),
   closeLibrary: () => set({ isLibraryOpen: false }),
   toggleLibrary: () => set((state) => ({ isLibraryOpen: !state.isLibraryOpen })),
@@ -44,4 +54,10 @@ export const useUIStore = create<UIState>((set) => ({
   openAlbumsList: () => set({ isAlbumsListOpen: true }),
   closeAlbumsList: () => set({ isAlbumsListOpen: false }),
   toggleAlbumsList: () => set((state) => ({ isAlbumsListOpen: !state.isAlbumsListOpen })),
+  openAuth: () => set({ isAuthOpen: true }),
+  closeAuth: () => set({ isAuthOpen: false }),
+  toggleAuth: () => set((state) => ({ isAuthOpen: !state.isAuthOpen })),
+  openProjects: () => set({ isProjectsOpen: true }),
+  closeProjects: () => set({ isProjectsOpen: false }),
+  toggleProjects: () => set((state) => ({ isProjectsOpen: !state.isProjectsOpen })),
 }));

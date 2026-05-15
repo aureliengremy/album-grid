@@ -1,5 +1,17 @@
 import { Album } from '@/types';
 
+interface SpotifyAlbumItem {
+  id: string;
+  name: string;
+  artists: Array<{ name: string }>;
+  images: Array<{ url: string }>;
+  release_date?: string;
+}
+
+interface SpotifySearchResponse {
+  albums: { items: SpotifyAlbumItem[] };
+}
+
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 
@@ -60,8 +72,8 @@ export async function searchSpotify(query: string, limit = 20): Promise<Album[]>
 
     if (!res.ok) throw new Error(`Spotify API error: ${res.statusText}`);
 
-    const data = await res.json();
-    return data.albums.items.map((item: any) => ({
+    const data = (await res.json()) as SpotifySearchResponse;
+    return data.albums.items.map((item) => ({
       id: item.id,
       title: item.name,
       artist: item.artists[0]?.name || 'Unknown',

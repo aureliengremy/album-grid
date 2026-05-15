@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { Button } from "@/components/ui/button";
 import { PORTRAIT_FORMATS } from "@/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
 // Calculate how many albums are needed to fill a portrait format

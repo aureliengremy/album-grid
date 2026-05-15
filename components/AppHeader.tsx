@@ -6,6 +6,10 @@ import { useUIStore } from "@/lib/stores/ui-store";
 import { Download, Grid3X3, Search, Settings, Undo, Redo, Trash2, List } from "lucide-react";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { UserMenu } from "@/components/auth/UserMenu";
+import { SaveControl } from "@/components/projects/SaveControl";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import { ProjectsDialog } from "@/components/projects/ProjectsDialog";
 
 export function AppHeader() {
   const { albums, clearAll } = useAlbumStore();
@@ -81,6 +85,11 @@ export function AppHeader() {
           <Download className="w-4 h-4 mr-2" />
           Export
         </Button>
+
+        <div className="w-px h-6 bg-border mx-2" />
+
+        <SaveControl />
+        <UserMenu />
       </div>
 
       <ConfirmDialog
@@ -92,6 +101,9 @@ export function AppHeader() {
         variant="destructive"
         confirmLabel="Clear All"
       />
+
+      <AuthDialog />
+      <ProjectsDialog />
     </header>
   );
 }

@@ -11,7 +11,7 @@ import { useAlbumStore } from "@/lib/stores/album-store";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, GripVertical } from "lucide-react";
+import { X } from "lucide-react";
 import { PORTRAIT_FORMATS } from "@/types";
 
 export function AlbumsListSidebar() {

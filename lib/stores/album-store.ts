@@ -72,11 +72,8 @@ export const useAlbumStore = create<AlbumState>()(
     ),
     {
       limit: 50, // Limiter l'historique à 50 états
-      partialize: (state) => {
-        // Ne tracker que albums et settings dans l'historique
-        const { addAlbum, removeAlbum, reorderAlbums, updateSettings, resetSettings, clearAll, ...rest } = state;
-        return rest;
-      },
+      // Ne tracker que albums et settings dans l'historique (mêmes champs que persist).
+      partialize: (state) => ({ albums: state.albums, settings: state.settings }),
     }
   )
 );

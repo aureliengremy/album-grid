@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,10 +18,6 @@ export const metadata: Metadata = {
   description: "Creez des mosaiques d'albums musicaux pour impression. Recherchez, arrangez et exportez en haute resolution.",
 };
 
-import { Toaster } from "@/components/ui/sonner";
-import { AppHeader } from "@/components/AppHeader";
-import { AppFooter } from "@/components/AppFooter";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,13 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex flex-col min-h-screen">
-          <AppHeader />
-          <main className="flex-1 flex flex-col overflow-hidden relative">
-            {children}
-          </main>
-          <AppFooter />
-        </div>
+        {children}
         <Toaster />
       </body>
     </html>

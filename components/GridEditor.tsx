@@ -18,8 +18,8 @@ import {
 } from '@dnd-kit/sortable';
 import { useAlbumStore } from '@/lib/stores/album-store';
 import { SortableAlbum } from './SortableAlbum';
+import { GridCanvas } from './GridCanvas';
 import { useState, useMemo } from 'react';
-import { PORTRAIT_FORMATS } from '@/types';
 
 export function GridEditor() {
   const { albums, settings, reorderAlbums } = useAlbumStore();
@@ -50,24 +50,6 @@ export function GridEditor() {
     [activeId, albums]
   );
 
-  // Get selected portrait format and calculate layout
-  const { aspectRatio, rows, cols, selectedFormat } = useMemo(() => {
-    const count = albums.length || 1;
-    const cols = settings.columns;
-    const rows = Math.ceil(count / cols) || 1;
-
-    // Get the selected portrait format
-    const format = PORTRAIT_FORMATS.find(f => f.id === settings.portraitFormatId)
-      || PORTRAIT_FORMATS.find(f => f.id === '50x70')!; // Fallback to IKEA Standard
-
-    return {
-      cols,
-      rows,
-      aspectRatio: `${format.widthCm} / ${format.heightCm}`,
-      selectedFormat: format,
-    };
-  }, [albums.length, settings.columns, settings.portraitFormatId]);
-
   return (
     <DndContext
       sensors={sensors}
@@ -75,60 +57,16 @@ export function GridEditor() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div
-        className="shadow-sm transition-all duration-300 ease-in-out"
-        style={{
-          // Portrait format aspect ratio - always fully visible (contain behavior)
-          aspectRatio,
-
-          // Contain within parent: fit both dimensions, never exceed
-          maxWidth: '100%',
-          maxHeight: '100%',
-
-          // For portrait formats (height > width), bind height and let width auto-calculate
-          // For landscape/square, bind width and let height auto-calculate
-          ...(selectedFormat.heightCm > selectedFormat.widthCm
-            ? { height: '100%', width: 'auto' }
-            : { width: '100%', height: 'auto' }),
-
-          // Padding = frame around the entire grid
-          padding: `${settings.padding}px`,
-          backgroundColor: settings.backgroundColor,
-        }}
-        id="mosaic-canvas"
-      >
-        {/* Inner grid container for albums - square cells that fit */}
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'grid',
-            gridTemplateColumns: `repeat(${cols}, 1fr)`,
-            gridTemplateRows: `repeat(${rows}, 1fr)`,
-            gap: `${settings.gap}px`,
-          }}
-        >
-        <SortableContext 
-          items={albums.map(a => a.id)} 
+      <GridCanvas albums={albums} settings={settings}>
+        <SortableContext
+          items={albums.map((a) => a.id)}
           strategy={rectSortingStrategy}
         >
           {albums.map((album) => (
             <SortableAlbum key={album.id} album={album} />
           ))}
         </SortableContext>
-        
-        {/* Placeholder if empty */}
-        {albums.length === 0 && (
-           <div
-             className="col-span-full h-64 flex flex-col items-center justify-center rounded-lg"
-             style={{ color: '#6b7280', border: '2px dashed #d1d5db' }}
-           >
-             <p>No albums selected.</p>
-             <p style={{ fontSize: '0.875rem' }}>Search and add albums from the library.</p>
-           </div>
-        )}
-        </div>
-      </div>
+      </GridCanvas>
 
       <DragOverlay>
         {activeAlbum ? (
